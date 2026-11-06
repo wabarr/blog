@@ -1,0 +1,80 @@
+{% extends 'blog/base.html' %}
+{% block extra_head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+{% endblock %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% load comments %}
+
+{% block content %}
+<div id="scroll-target" class="row border rounded mb-3 pt-3">
+    <h2>{{ object.title | safe }}</h2>
+    <h3 class="pb-3">By {{ object.author.first_name }}</h3>
+    <h4> {% for cat in object.category.all %}🗃{{ cat.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
+
+    <p>{{ post.published_date}}</p>
+
+    {%  for block in object.blocks.all  %}
+        <div class="row">
+        <div class="col">
+    {% if block.img %}
+        <img class="img-fluid pb-3" src="{{ block.img.url }}">
+    {% else %}
+        {{ block.content | safe }}
+    {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="row pb-3">
+    <div class="col">
+        {% if prevpost %}
+                <a href="/posts/{{ prevpost.slug }}"> ⬅️ Previous post</a>
+        {% else %}
+            <p>There are no older posts</p>
+        {% endif %}
+    </div>
+
+    <div class="col d-flex justify-content-end">
+        {% if nextpost %}
+            <a href="/posts/{{ nextpost.slug }}">Next post ➡️ </a>
+        {% else %}
+            <p>There are no more recent posts</p>
+        {% endif %}
+    </div>
+
+    </div>
+</div>
+
+    <div class="row">
+
+    <h3 class="pb-3">Comments and replies</h3>
+    {% render_comment_list for object  %}
+
+    <h3 class="pt-3 pb-3">Post location</h3>
+    {% if object.map_latitude and object.map_longitude %}
+
+        <div id="map" style="height: 450px;"></div>
+
+
+        <script>
+            var map = L.map("map").setView([{{object.map_latitude}}, {{object.map_longitude}}], 6);
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                maxZoom: 19,
+                attribution: "<a href='https://www.openstreetmap.org/copyright'>&copy; OpenStreetMap</a>",
+                referrerPolicy: 'strict-origin-when-cross-origin'
+            }).addTo(map);
+            L.marker([{{object.map_latitude}}, {{object.map_longitude}}]).addTo(map)
+            .bindPopup('{{object.map_popup_label}}')
+            .openPopup();
+        </script>
+    {% endif %}
+</div>
+{% endblock %}

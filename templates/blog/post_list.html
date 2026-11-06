@@ -1,0 +1,60 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Fentarr Sabbatical Blog{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <h2 class="pb-3">All posts</h2>
+    </div>
+    {% for post in object_list %}
+        <div class="row border rounded mb-3 pt-3 single-post-in-list">
+
+            <h2 class="post-title" data-target-url="/posts/{{ post.slug }}">{{ post.title | safe }}</h2>
+
+            <h3 class="pb-3">By {{ post.author.first_name }}</h3>
+
+            <h4> {% for cat in post.category.all %}<span class="post-category" data-target-url="categories/{{ cat.name }}">🗃 {{ cat.name }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
+
+            <p>{{ post.published_date}}</p>
+
+                <img class="img-fluid pb-3" src="{{ post.get_first_img_url }}">
+
+
+            <p>{{ post.get_truncated_content }}...</p>
+            <p><a href="/posts/{{ post.slug }}">Read full post</a></p>
+        </div>
+    {% endfor %}
+
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+    $(".post-title, .post-category").click(function(){
+        window.location.href = this.dataset.targetUrl;
+    }).on({
+      mouseenter: function() {
+          $(this).css({'text-decoration': 'underline', "cursor": "pointer"});
+        },
+        mouseleave: function() {
+            $(this).css({'text-decoration': 'none', "cursor": "default"});
+        }
+    });
+    </script>
+{% endblock %}

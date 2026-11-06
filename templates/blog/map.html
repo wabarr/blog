@@ -1,0 +1,55 @@
+{% extends 'blog/base.html' %}
+{% block extra_head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+{% endblock %}
+
+{% block title %}Our Map{% endblock %}
+
+
+{% block content %}
+
+
+       <div class="row">
+       <h2 class="pb-3">Our Map</h2>
+       </div>
+
+
+        <div id="map" style="height: 450px;"></div>
+
+
+<script>
+var markers = new L.featureGroup();
+var map = L.map("map").setView([15,-40], 2)
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "<a href='https://www.openstreetmap.org/copyright'>&copy; OpenStreetMap</a>",
+    referrerPolicy: 'strict-origin-when-cross-origin'
+}).addTo(map);
+
+{% for post in posts %}
+	   var theMarker = L.marker([{{post.map_latitude}}, {{post.map_longitude}}]);
+       var popupVal = "{{ post.map_popup_label }}" + "<br/>" + "{{ post.published_date | date:'F j, Y' }}"
+       theMarker.bindPopup(popupVal)
+			.on("dblclick", function (e) {
+    			window.location.href="/posts/{{ post.slug }}";
+			});
+			markers.addLayer(theMarker);
+{% endfor %}
+
+markers.addTo(map);
+
+map.fitBounds(markers.getBounds(), {
+       // Add 20 pixels of padding around the bounds
+       padding: [20, 20],
+       // Use a smooth animation
+       animate: true
+	   });
+</script>
+
+{% endblock %}
