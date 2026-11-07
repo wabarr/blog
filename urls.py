@@ -16,7 +16,8 @@ Including another URLconf
 """
 from blog.admin import BlogAdminSite, admin
 from django.urls import path, include
-from blog.views import  HomeView, MapView, AboutView, CategoryView, CategoryListView, login_view, PostDetailView
+from blog.views import  (HomeView, MapView, AboutView, CategoryView, CategoryListView,
+                         login_view, PostDetailView, edit_composite_post, create_composite_post)
 
 
 urlpatterns = [
@@ -29,6 +30,8 @@ urlpatterns = [
     path('categories/', CategoryListView.as_view()),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
     path("posts/<slug:slug>/", PostDetailView.as_view(), name="post-detail"),
+    path("edit/<pk>/", edit_composite_post, name="manage-composite-post"),
+    path("create/", create_composite_post, name="create-composite-post"),
     path('comments/', include('django_comments.urls')),
     path('su/',admin.site.urls),
 

@@ -2,11 +2,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic import TemplateView
 
-from blog.models import  CompositePost, Category
+from blog.models import  CompositePost, Category, Block
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import redirect, render
-from django.contrib.auth.decorators import login_not_required
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_not_required, permission_required
+from blog.forms import BlockFormset, CompositePostForm
 
 
 class CategoryListView(ListView):
@@ -56,3 +57,58 @@ def login_view(request):
     form = AuthenticationForm()
 
   return render(request, "blog/login.html", {"form": form})
+
+@permission_required('blog.add_composite_post')
+def edit_composite_post(request, pk=None):
+    composite_post = get_object_or_404(CompositePost, pk=pk) if pk else None
+    if request.method == 'POST':
+        form = CompositePostForm(request.POST, request.FILES, instance=composite_post)
+        formset = BlockFormset(request.POST, request.FILES, instance=composite_post)
+
+        # Check validation on BOTH the main form and formset
+        if form.is_valid() and formset.is_valid():
+            # Save the parent instance first
+            parent_instance = form.save()
+
+            # Associate the formset data with the saved parent and save children
+            formset.instance = parent_instance
+            formset.save()
+
+            return redirect('/')  # Replace with your success URL
+    else:
+        form = CompositePostForm(instance=composite_post)
+        formset = BlockFormset(instance=composite_post)
+
+    context = {
+        'form': form,
+        'formset': formset,
+        'is_edit': pk is not None
+    }
+    return render(request, 'blog/manage_composite_post.html', context)
+
+@permission_required('blog.add_composite_post')
+def create_composite_post(request):
+    if request.method == 'POST':
+        form = CompositePostForm(request.POST, request.FILES)
+        formset = BlockFormset(request.POST, request.FILES)
+
+        # Check validation on BOTH the main form and formset
+        if form.is_valid() and formset.is_valid():
+            # Save the parent instance first
+            parent_instance = form.save()
+
+            # Associate the formset data with the saved parent and save children
+            formset.instance = parent_instance
+            formset.save()
+
+            return redirect('/')  # Replace with your success URL
+    else:
+        form = CompositePostForm()
+        formset = BlockFormset()
+
+    context = {
+        'form': form,
+        'formset': formset,
+        'is_edit': False
+    }
+    return render(request, 'blog/manage_composite_post.html', context)

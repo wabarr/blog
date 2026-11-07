@@ -1,0 +1,49 @@
+{% extends 'blog/base.html' %}
+
+
+{% block title %}Manage Post{% endblock %}
+{% block extra_head %}{{ formset.media }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <h3>Post Details</h3>
+    {{ form.as_p }}
+
+    <h3>Content Blocks</h3>
+    <!-- Crucial management form fields -->
+    {{ formset.management_form }}
+    
+    <div id="tasks-formset-container">
+        {% for block_form in formset %}
+            <div class="task-form-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                <!-- Include hidden fields (like ID) so Django knows which record is which -->
+                {{ block_form.id }}
+                
+                {{ block_form.content.label_tag }} {{ block_form.content }}
+                {{ block_form.post.label_tag }} {{ block_form.post }}
+                {{ block_form.img.label_tag }} {{ block_form.img }}
+                {{ block_form.sort_order.label_tag }} {{ block_form.sort_order }}
+                
+                {% if formset.can_delete and block_form.instance.pk %}
+                    <label>Delete:</label> {{ block_form.DELETE }}
+                {% endif %}
+                
+                <!-- Display inline errors if validation fails -->
+                {% if block_form.errors %}
+                    <div class="errors" style="color: red;">
+                        {{ block_form.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit">Save Everything</button>
+</form>
+</div>
+    
+{% endblock %}

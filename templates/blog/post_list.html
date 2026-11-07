@@ -20,7 +20,7 @@
                 <img class="img-fluid pb-3" src="{{ post.get_first_img_url }}">
 
 
-            <p>{{ post.get_truncated_content }}...</p>
+            {% if post.get_truncated_content %}<p>{{ post.get_truncated_content }}...</p>{% endif %}
             <p><a href="/posts/{{ post.slug }}">Read full post</a></p>
         </div>
     {% endfor %}
