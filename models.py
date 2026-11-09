@@ -35,10 +35,11 @@ class Block(models.Model):
         else:
             return f"content block pK={ self.pk }"
 
+
 class CompositePost(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='compositeposts', limit_choices_to={'is_staff': True})
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='compositeposts', limit_choices_to={'is_staff': True}, default=1)
     category = models.ManyToManyField(Category)
     map_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     map_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)

@@ -17,9 +17,9 @@
     <!-- Crucial management form fields -->
     {{ formset.management_form }}
     
-    <div id="tasks-formset-container">
+    <div id="blocks-formset-container">
         {% for block_form in formset %}
-            <div class="task-form-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+            <div class="block-form-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
                 <!-- Include hidden fields (like ID) so Django knows which record is which -->
                 {{ block_form.id }}
                 
@@ -43,7 +43,32 @@
     </div>
 
     <button type="submit">Save Everything</button>
+    <button type="button" id="add-image">+ Add Image</button>
+    <button type="button" id="add-text-block">+ Add Text Block</button>
 </form>
 </div>
-    
+
+    <div class="row" style="display:none">
+        <div id="empty-form-row" class="block-form-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+            <p>empty form</p>
+            {{ formset.empty_form }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+    $("#add-text-block").on('click', function() {
+        var countformsstring = $("#id_blocks-TOTAL_FORMS").val();
+        var countforms = Number(countformsstring);
+        $("#empty-form-row").clone()
+            .removeAttr("id")
+            .html(function(_, oldHtml) {
+                return oldHtml.replace(/__prefix__/g, countforms);
+                })
+            .appendTo("#blocks-formset-container");
+        $("#id_blocks-" + countformsstring + "-sort_order").attr("value", countforms);
+        $("#id_blocks-TOTAL_FORMS").attr("value", countforms+1)
+    });
+    </script>
 {% endblock %}

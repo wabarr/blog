@@ -109,6 +109,6 @@ def create_composite_post(request):
     context = {
         'form': form,
         'formset': formset,
-        'is_edit': False
+        'is_edit': False,
     }
     return render(request, 'blog/manage_composite_post.html', context)
