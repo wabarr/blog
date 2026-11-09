@@ -58,17 +58,39 @@
 
 {% block extra_script %}
     <script>
-    $("#add-text-block").on('click', function() {
+    function addBlock(removeContentField = false) {
         var countformsstring = $("#id_blocks-TOTAL_FORMS").val();
         var countforms = Number(countformsstring);
-        $("#empty-form-row").clone()
+        if (removeContentField === true) {
+             $("#empty-form-row").clone()
+            .removeAttr("id")
+            .appendTo("#blocks-formset-container")
+            .html(function(_, oldHtml) {
+                return oldHtml.replace(/__prefix__/g, countforms);
+                })
+            .find(".ck-editor-container")
+            .parent()
+            .remove()
+            ;
+        } else {
+            $("#empty-form-row").clone()
             .removeAttr("id")
             .html(function(_, oldHtml) {
                 return oldHtml.replace(/__prefix__/g, countforms);
                 })
             .appendTo("#blocks-formset-container");
+        };
+
         $("#id_blocks-" + countformsstring + "-sort_order").attr("value", countforms);
-        $("#id_blocks-TOTAL_FORMS").attr("value", countforms+1)
+        $("#id_blocks-TOTAL_FORMS").attr("value", countforms+1);
+    };
+    $("#add-text-block").on('click', function() {
+        addBlock();
     });
+    $("#add-image").on('click', function() {
+        addBlock(removeContentField = true );
+    });
+
+
     </script>
 {% endblock %}
