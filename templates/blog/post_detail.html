@@ -26,9 +26,10 @@
     <p>{{ post.published_date}}</p>
 
     {% if perms.composite_post.edit_composite_post %}
-    <div class="d-flex flex-row-reverse">
-        <div class="p-2"><a href="/edit/{{ object.pk }}">Edit this post</a></div>
-    </div>
+        <div class="col pb-3">
+        <button onclick="window.location.href='/edit/{{ object.pk }}'">Edit this post</button>
+        </div>
+
     {% endif  %}
 
     {%  for block in object.blocks.all  %}
@@ -48,7 +49,7 @@
     <div class="row pb-3">
     <div class="col">
         {% if prevpost %}
-                <a href="/posts/{{ prevpost.slug }}"> ⬅️ Previous post</a>
+                <button onclick="window.location.href='/posts/{{ prevpost.slug }}'"> ⬅️ Previous post</button>
         {% else %}
             <p>There are no older posts</p>
         {% endif %}
@@ -56,7 +57,7 @@
 
     <div class="col d-flex justify-content-end">
         {% if nextpost %}
-            <a href="/posts/{{ nextpost.slug }}">Next post ➡️ </a>
+            <button onclick="window.location.href='/posts/{{ nextpost.slug }}'">Next post ➡️</button>
         {% else %}
             <p>There are no more recent posts</p>
         {% endif %}
