@@ -15,11 +15,21 @@
 
 {% block content %}
 <div id="scroll-target" class="row border rounded mb-3 pt-3">
+
     <h2>{{ object.title | safe }}</h2>
     <h3 class="pb-3">By {{ object.author.first_name }}</h3>
+
+
+
     <h4> {% for cat in object.category.all %}🗃{{ cat.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
 
     <p>{{ post.published_date}}</p>
+
+    {% if perms.composite_post.edit_composite_post %}
+    <div class="d-flex flex-row-reverse">
+        <div class="p-2"><a href="/edit/{{ object.pk }}">Edit this post</a></div>
+    </div>
+    {% endif  %}
 
     {%  for block in object.blocks.all  %}
         <div class="row">
@@ -33,13 +43,7 @@
     </div>
     {% endfor %}
 
-    {% if perms.composite_post.edit_composite_post %}
-        <div class="row">
-        <div class="col">
-            <a href="/edit/{{ object.pk }}">Edit this post</a>
-        </div>
-        </div>
-    {% endif  %}
+
 
     <div class="row pb-3">
     <div class="col">
