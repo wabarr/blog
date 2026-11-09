@@ -28,6 +28,18 @@ class PostDetailView(DetailView):
     model = CompositePost
     template_name = "blog/post_detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['nextpost'] = self.object.get_next_by_published_date()
+        except:
+            pass
+        try:
+            context['prevpost'] = self.object.get_previous_by_published_date()
+        except:
+            pass
+        return(context)
+
 class AboutView(TemplateView):
     template_name = 'blog/about.html'
 

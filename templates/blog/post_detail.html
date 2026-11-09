@@ -33,6 +33,14 @@
     </div>
     {% endfor %}
 
+    {% if perms.composite_post.edit_composite_post %}
+        <div class="row">
+        <div class="col">
+            <a href="/manage/{{ object.pk }}">Edit this post</a>
+        </div>
+        </div>
+    {% endif  %}
+
     <div class="row pb-3">
     <div class="col">
         {% if prevpost %}
@@ -56,7 +64,7 @@
     <div class="row">
 
     <h3 class="pb-3">Comments and replies</h3>
-    {% render_comment_list for object  %}
+    {% render_comment_list for object %}
 
     <h3 class="pt-3 pb-3">Post location</h3>
     {% if object.map_latitude and object.map_longitude %}
