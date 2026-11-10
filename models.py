@@ -4,7 +4,8 @@ from django.utils import timezone
 from django_ckeditor_5.fields import CKEditor5Field
 from django.core.files.storage import storages
 from bs4 import BeautifulSoup
-
+from django.db.models.signals import post_delete, pre_save
+from django.dispatch import receiver
 
 
 
@@ -34,6 +35,26 @@ class Block(models.Model):
             return f"image block pk:{self.pk}"
         else:
             return f"content block pK={ self.pk }"
+
+@receiver(post_delete, sender=Block)
+def delete_file_on_model_delete(sender, instance, **kwargs):
+    if instance.img:
+        # pass False to prevent Django from saving the model again
+        instance.img.delete(False)
+
+@receiver(pre_save, sender=Block)
+def delete_old_file_on_change(sender, instance, **kwargs):
+    if not instance.pk:
+        return False
+
+    try:
+        old_img = sender.objects.get(pk=instance.pk).img
+    except sender.DoesNotExist:
+        return False
+
+    new_img = instance.img
+    if old_img and old_img != new_img:
+        old_img.delete(False)
 
 
 class CompositePost(models.Model):
