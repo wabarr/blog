@@ -20,7 +20,9 @@
     
     <div id="blocks-formset-container">
         {% for block_form in formset %}
+            <div class="single-block-form p-3 mb-4 border rounded">
             {{ block_form|crispy }}
+            </div>
         {% endfor %}
     </div>
 
@@ -31,8 +33,7 @@
 </div>
 
     <div class="row" style="display:none">
-        <div id="empty-form-row" class="block-form-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
-            <p>empty form</p>
+        <div id="empty-form-row" class="single-block-form p-3 mb-4 border rounded">
             {{ formset.empty_form }}
         </div>
     </div>
@@ -40,7 +41,7 @@
 
 {% block extra_script %}
     <script>
-    function addBlock(removeContentField = false) {
+    function addBlock(removeContentField = null, removeImageField = null) {
         var countformsstring = $("#id_blocks-TOTAL_FORMS").val();
         var countforms = Number(countformsstring);
         if (removeContentField === true) {
@@ -52,27 +53,50 @@
                 })
             .find(".ck-editor-container")
             .parent()
-            .remove()
-            ;
-        } else {
-            $("#empty-form-row").clone()
+            .remove();
+        };
+        if (removeImageField === true){
+             $("#empty-form-row").clone()
             .removeAttr("id")
+            .appendTo("#blocks-formset-container")
             .html(function(_, oldHtml) {
                 return oldHtml.replace(/__prefix__/g, countforms);
                 })
-            .appendTo("#blocks-formset-container");
+
+            .find("[id$='img']")
+            .remove();
+
+             $(`[for="id_blocks-${countforms}-img"]`).remove();
         };
 
         $("#id_blocks-" + countformsstring + "-sort_order").attr("value", countforms);
         $("#id_blocks-TOTAL_FORMS").attr("value", countforms+1);
     };
     $("#add-text-block").on('click', function() {
-        addBlock();
+        addBlock(null, true );
     });
     $("#add-image").on('click', function() {
-        addBlock(removeContentField = true );
+        addBlock(true, null);
     });
-
+    document.addEventListener("DOMContentLoaded", () => {
+        $('.single-block-form').each(function(index, element) {
+            //for each individual block form
+            if($(this).find('a').html()) {
+                //if there is an anchor tag with html, then that should be the pointer to the current image
+                //so we remove the content input since images don't have content
+                $(this).find('[id$="content"]').remove();
+                //$('[id$="content"]').remove();
+            };
+            var editor = $(this).find(".ck-editor__editable");
+            var content = editor.html();
+            if(content){
+                var textContent =  content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim()
+                if(textContent != ""){
+                    $(editor).closest('.single-block-form').find('[id$="img"]').remove();
+                }
+            }
+        });
+    });
 
     </script>
 {% endblock %}

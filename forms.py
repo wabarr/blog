@@ -10,6 +10,7 @@ BlockFormset = inlineformset_factory(
     parent_model=CompositePost,
     model=Block,
     fields=['content', 'post', 'img', 'sort_order'],
+    help_texts={'content':None},
     extra=0,            # Number of empty form fields to show by default
     can_delete=True     # Allows users to mark existing children for deletion
 )
