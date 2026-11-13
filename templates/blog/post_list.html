@@ -3,7 +3,6 @@
 
 {% block content %}
     <div class="row">
-    <h2 class="pb-3">All posts</h2>
     </div>
     {% for post in object_list %}
         <div class="row border rounded mb-3 pt-3 single-post-in-list">
@@ -16,7 +15,7 @@
 
             <p>{{ post.published_date}}</p>
 
-                <img class="img-fluid pb-3" src="{{ post.get_first_img_url }}">
+               {% if post.get_first_img_url %} <img class="img-fluid pb-3" src="{{ post.get_first_img_url }}">{% endif %}
 
 
             {% if post.get_truncated_content %}<p>{{ post.get_truncated_content }}...</p>{% endif %}
