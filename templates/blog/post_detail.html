@@ -74,7 +74,8 @@
             <p class="pb-4">{{ comment.content }}</p>
         {% endfor %}
         <h4>Post a comment</h4>
-    <form action="{% url 'post-detail' object.slug %}" method="post" class="mt-4">
+    <p>You are commenting as {{ user.first_name }}</p>
+    <form action="{% url 'post-detail' object.slug %}" method="post">
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" name="post" class="btn btn-primary">Post Comment</button>

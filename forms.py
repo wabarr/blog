@@ -1,5 +1,6 @@
 from django.forms import ModelForm, inlineformset_factory
 from blog.models import CompositePost, Block, BlogComment
+from django import forms
 
 class CompositePostForm(ModelForm):
     class Meta:
@@ -20,3 +21,12 @@ class BlogCommentForm(ModelForm):
         #exclude the post and user field because a user should never alter this
         #post will be handled in the view logic
         fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'placeholder': 'What do you have to say?',
+                'rows': 3,
+            }),
+        }
+        labels = {
+            'content': '',
+        }
