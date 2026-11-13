@@ -2,12 +2,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic import TemplateView
 
-from blog.models import  CompositePost, Category, Block
+from blog.models import  CompositePost, Category, BlogComment
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_not_required, permission_required
-from blog.forms import BlockFormset, CompositePostForm
+from blog.forms import BlockFormset, CompositePostForm, BlogCommentForm
 
 
 class CategoryListView(ListView):
@@ -30,6 +30,9 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context['form'] = BlogCommentForm()
+
         try:
             context['nextpost'] = self.object.get_next_by_published_date()
         except:
@@ -38,7 +41,28 @@ class PostDetailView(DetailView):
             context['prevpost'] = self.object.get_previous_by_published_date()
         except:
             pass
+        try:
+            context['comments'] = BlogComment.objects.filter(post=self.object.pk).order_by('-created')
+        except:
+            pass
+
         return(context)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = BlogCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.user = self.request.user
+            #the post field is not included in the form so it needs to be added in here in the view
+            comment.save()
+            return redirect('post-detail', slug=self.object.slug)
+
+        # If invalid, re-render the page with the object and form errors
+        context = self.get_context_data(object=self.object)
+        context['form'] = form
+        return self.render_to_response(context)
 
 class AboutView(TemplateView):
     template_name = 'blog/about.html'

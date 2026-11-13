@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{%  load crispy_forms_tags %}
 {% block extra_head %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -10,7 +11,7 @@
 {% endblock %}
 
 
-{% load comments %}
+
 
 {% block content %}
 <div id="scroll-target" class="row border rounded mb-3 pt-3">
@@ -68,10 +69,20 @@
     <div class="row">
 
     <h3 class="pb-3">Comments and replies</h3>
-    {% render_comment_list for object %}
+        {% for comment in comments %}
+            <p><b>{{ comment.user.first_name }} at {{ comment.created }}</b></p>
+            <p class="pb-4">{{ comment.content }}</p>
+        {% endfor %}
+        <h4>Post a comment</h4>
+    <form action="{% url 'post-detail' object.slug %}" method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" name="post" class="btn btn-primary">Post Comment</button>
 
+    </form>
+ {% if object.map_latitude and object.map_longitude %}
     <h3 class="pt-3 pb-3">Post location</h3>
-    {% if object.map_latitude and object.map_longitude %}
+
 
         <div id="map" style="height: 450px;"></div>
 

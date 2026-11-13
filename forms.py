@@ -1,5 +1,5 @@
 from django.forms import ModelForm, inlineformset_factory
-from blog.models import CompositePost, Block
+from blog.models import CompositePost, Block, BlogComment
 
 class CompositePostForm(ModelForm):
     class Meta:
@@ -14,3 +14,9 @@ BlockFormset = inlineformset_factory(
     extra=0,            # Number of empty form fields to show by default
     can_delete=True     # Allows users to mark existing children for deletion
 )
+class BlogCommentForm(ModelForm):
+    class Meta:
+        model = BlogComment
+        #exclude the post and user field because a user should never alter this
+        #post will be handled in the view logic
+        fields = ['content']

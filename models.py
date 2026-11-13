@@ -6,6 +6,7 @@ from django.core.files.storage import storages
 from bs4 import BeautifulSoup
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 
 
@@ -91,3 +92,10 @@ class CompositePost(models.Model):
                 return clean_text[:150]
             else:
                 pass
+
+class BlogComment(models.Model):
+    post = models.ForeignKey(CompositePost, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blogcomments')
+    content = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    published = models.BooleanField(default=True)
